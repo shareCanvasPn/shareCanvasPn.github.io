@@ -13,7 +13,7 @@ $(function(){
     var images = new Array(image0, image1, image2, image3);
 
     // global counter and canvas
-    var counter = 0, ctx, interval;
+    var counter = 0, ctx, interval,calc=true;
 
     var canvas = document.getElementById('myCanvas');
     ctx = canvas.getContext('2d');
@@ -28,10 +28,20 @@ $(function(){
 
 
     $('#nextSlide').click(function(){
-        counter++;
+
+        if(calc){
+            counter++;
+        }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(images[counter], 0, 0,canvas.width, canvas.height);
-        if (counter==images.length-1) {counter=0;}
+
+        calc = true;
+
+        if (counter==images.length-1) {
+
+            counter=0;
+            calc = false;
+        }
 
         //Usage example:
     });
