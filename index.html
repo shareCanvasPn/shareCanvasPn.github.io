@@ -141,6 +141,26 @@
             border-top:1px solid #777;
             background: inherit;
         }
+
+
+
+
+
+        #myProgress {
+            position: relative;
+            width: 50%;
+            height: 30px;
+            background-color: #ddd;
+        }
+
+        #myBar {
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+        }
+
+
     </style>
     <style>
         * {
@@ -169,14 +189,23 @@
 </form>
 
 <br>
-<canvas id="myCanvas" width="400" height="300"></canvas>
-<button type="button" id="nextSlide">NextSlide</button>
-<button type="button" id="sendSlide">SendSlide</button>
+
+
+<div style="width:600px;margin: auto;">
+    <canvas id="myCanvas" width="400" height="300"></canvas>
+    <div id="myProgress" style="margin:auto;">
+        <div id="myBar"></div>
+    </div>
+    <button type="button" id="nextSlide">NextSlide</button>
+    <button type="button" id="sendSlide">SendSlide</button>
+
+</div>
 
 
 
 <div class="button" id="setup-offer">
     <span>Setup</span><span>WebRTC Connection</span>
+
 </div>
 
 
@@ -200,8 +229,21 @@
 
 <script>
 
+
+
+    function pourcent(maxchanks1,maxchanks2){
+        //return (maxchanks2*100)/maxchanks1;
+        var diff= maxchanks1-maxchanks2;
+
+        return (diff*100)/maxchanks1;
+    }
+
+
+
+
     var video_hold = document.getElementById("video-chat");
     var video_out  = document.getElementById("vid-box");
+    var elem = document.getElementById("myBar");
 
     var progressHelper = { };
     var outputPanel = document.querySelector('.output-panel');
@@ -245,6 +287,7 @@
 
 
     var chunkLength = 16000;
+    var dataURILenght;
 
     document.querySelector('input[type=file]').onchange = function() {
         var file = this.files[0];
@@ -260,10 +303,12 @@
         var canvas = document.getElementById('myCanvas');
         var dataURL = canvas.toDataURL();
 
+        dataURILenght = dataURL.length;
+        //console.log(dataURILenght);
+
         $('#sendSlide').attr('disabled','disabled');
-        setTimeout(function(){
-            $('#sendSlide').removeAttr('disabled');
-        },500);
+        $('#sendSlide').text('Sending...');
+
 
         onReadAsDataURL(dataURL);
     });
@@ -280,12 +325,30 @@
 
         if (text.length > chunkLength) {
             data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
+            //console.log(Math.ceil(pourcent(dataURILenght,text.length)));
+            var mx = Math.ceil(pourcent(dataURILenght,text.length))
+
+            //move(mx)
+
+            data.progress = mx;
+
+            elem.style.width = mx + '%';
+
 
         } else {
             data.message = text;
             data.last = true;
+            data.progress = 100;
+
+            $('#sendSlide').removeAttr('disabled');
+            $('#sendSlide').text('SendSlide');
+
+            //console.log(100);
+            elem.style.width = 100 + '%';
+
+            //console.log(dataURILenght);
         }
-        //dataChannel.send(data); // use JSON.stringify for chrome!
+        //dataChannel.send(data); // use JSON.stringify for chrome!.
 
         window.phone.sendData(data);
 
@@ -304,6 +367,8 @@
 
 
 
+
+
     var arrayToStoreChunks = [];
     function onDataReceived(event){
 
@@ -312,6 +377,8 @@
         //var data = JSON.parse(event.data)
         arrayToStoreChunks.push(event.message); // pushing chunks in array
 
+
+        elem.style.width = event.progress + '%';
 
         if (event.last) {
             //console.log(arrayToStoreChunks.join(''));
@@ -323,6 +390,7 @@
 
             //console.log(blobUrl);
 
+            elem.style.width = event.progress + '%';
 
             $('#divImg').append('<img style="float: left;margin: 5px" src="'+blobUrl+'" width="100" height="100"/>');
 
