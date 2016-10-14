@@ -244,7 +244,7 @@
 
 
 
-    var chunkLength = 40 * 1000;
+    var chunkLength = 16000;
 
     document.querySelector('input[type=file]').onchange = function() {
         var file = this.files[0];
@@ -264,7 +264,7 @@
         setTimeout(function(){
             $('#sendSlide').removeAttr('disabled');
         },500);
-        
+
         onReadAsDataURL(dataURL);
     });
 
@@ -274,6 +274,9 @@
         var data = {}; // data object to transmit over data channel
 
         //if (event) text = event.target.result; // on first invocation
+
+
+        //console.log(text.length);
 
         if (text.length > chunkLength) {
             data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
@@ -287,9 +290,16 @@
         window.phone.sendData(data);
 
         var remainingDataURL = text.slice(data.message.length);
-        if (remainingDataURL.length) setTimeout(function () {
-            onReadAsDataURL(remainingDataURL); // continue transmitting
-        }, 40)
+
+        //console.log(remainingDataURL.length);
+        //console.log(remainingDataURL);
+
+
+        if (remainingDataURL.length)
+            setTimeout(function () {
+                onReadAsDataURL(remainingDataURL); // continue transmitting
+
+        }, 100)
     }
 
 
