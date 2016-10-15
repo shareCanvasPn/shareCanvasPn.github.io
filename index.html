@@ -278,8 +278,14 @@
 
     });
     phone.receive(function(session){
-        session.connected(function(session) {video_hold.hidden=false; video_out.appendChild(session.video);});
-        session.ended(function(session) {video_out.innerHTML='';});
+        session.connected(function(session) {
+            video_hold.hidden=false;
+            //video_out.appendChild(session.video);
+            $(video_out).append(session.video)
+        });
+        session.ended(function(session) {
+           // video_out.innerHTML='';
+        });
     });
     phone.datachannel(onDataReceived);
 
